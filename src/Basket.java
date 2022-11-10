@@ -1,8 +1,7 @@
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Scanner;
-import java.util.stream.Collectors;
+import java.util.*;
+
+import static java.util.stream.Collectors.toList;
 
 public class Basket {
     protected static String[] products;
@@ -45,7 +44,7 @@ public class Basket {
     }
 
     public void saveTxt(File textFile) throws IOException {
-        try (PrintWriter out = new PrintWriter(textFile);) {
+        try (PrintWriter out = new PrintWriter(textFile)) {
             for (String e : products)
                 out.print(e + " ");
             out.println("");
@@ -65,23 +64,18 @@ public class Basket {
         FileReader reader = new FileReader(textFile);
         Scanner scanner = new Scanner(reader);
         ArrayList<String> arrayList = new ArrayList<>();
-        String[] str1;
-        String[] str2;
-        String[] str3;
         while (scanner.hasNextLine()){
             arrayList.add(scanner.nextLine());
         }
         scanner.close();
         reader.close();
 
-        str1 = arrayList.get(0).split(" ");
-        str2 = arrayList.get(1).split(" ");
-        str3 = arrayList.get(2).split(" ");
-
-        for (int i = 0; i < str1.length; i++) {
-            products[i] = str1[i];
-            prices[i] = Integer.parseInt(str2[i]);
-            productCounts[i] = Integer.parseInt(str3[i]);
+        ArrayList<String[]> stringArrayList = (ArrayList<String[]>) arrayList.stream()
+                .map((s) -> s.split(" ")).collect(toList());
+        products = stringArrayList.get(0).clone();
+        for (int i = 0; i < products.length ; i++) {
+            prices[i] = Integer.parseInt(stringArrayList.get(1)[i]);
+            productCounts[i] = Integer.parseInt(stringArrayList.get(2)[i]);
         }
         return new Basket(products, prices, productCounts);
     }
@@ -93,8 +87,4 @@ public class Basket {
     public int[] getPrices() {
         return prices;
     }
-
-//    public static int[] getProductCounts() {
-//        return this.productCounts;
-//    }
 }
