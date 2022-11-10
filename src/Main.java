@@ -5,13 +5,15 @@ import java.util.Scanner;
 
 public class Main {
     public static File textFile;
-    public static void main(String[] args) throws IOException {
+    public static File binFile;
+    public static void main(String[] args) throws IOException, ClassNotFoundException {
 
         Basket basket = new Basket(new String[] {"Хлеб", "Яблоки", "Молоко"}, new int[] {100, 200, 300});
         textFile = new File("basket.txt");
-        if (textFile.exists()) {
+        binFile = new File("basket.bin");
+        if (binFile.exists()) {
             System.out.println("У Вас уже есть корзина для покупок");
-            Basket.loadFromTxtFile(textFile);
+            Basket.loadFromBinFile(binFile);
         }
         else {
             System.out.println("Создана корзина для покупок");

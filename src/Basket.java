@@ -3,7 +3,7 @@ import java.util.*;
 
 import static java.util.stream.Collectors.toList;
 
-public class Basket {
+public class Basket implements Serializable{
     protected static String[] products;
     protected static int[] prices;
 
@@ -15,14 +15,15 @@ public class Basket {
         productCounts = new int[Basket.prices.length];
     }
 
-    public Basket(String[] products, int[] prices, int[] productCounts){
+    public Basket(String[] products, int[] prices, int[] productCounts) {
         Basket.products = products;
         Basket.prices = prices;
         Basket.productCounts = productCounts;
     }
-    public void addToCart(int productNum, int amount) throws IOException {
+
+    public void addToCart(int productNum, int amount) {
         productCounts[productNum] += amount;
-        saveTxt(Main.textFile);
+        saveBin(Main.binFile);
     }
 
     public void printCart() {
@@ -43,7 +44,24 @@ public class Basket {
         System.out.println("Итого " + sumProducts + " руб");
     }
 
-    public void saveTxt(File textFile) throws IOException {
+    public void saveBin(File file)  {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file))){
+            oos.writeObject(products);
+            oos.writeObject(prices);
+            oos.writeObject(productCounts);
+        } catch (IOException exception) {
+            System.out.println(exception.getMessage());
+        }
+    }
+
+    public static void loadFromBinFile(File file) throws IOException, ClassNotFoundException {
+        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
+        products = (String[]) ois.readObject();
+        prices = (int[]) ois.readObject();
+        productCounts = (int[]) ois.readObject();
+    }
+
+    public void saveTxt(File textFile) {
         try (PrintWriter out = new PrintWriter(textFile)) {
             for (String e : products)
                 out.print(e + " ");
@@ -64,7 +82,7 @@ public class Basket {
         FileReader reader = new FileReader(textFile);
         Scanner scanner = new Scanner(reader);
         ArrayList<String> arrayList = new ArrayList<>();
-        while (scanner.hasNextLine()){
+        while (scanner.hasNextLine()) {
             arrayList.add(scanner.nextLine());
         }
         scanner.close();
@@ -73,7 +91,7 @@ public class Basket {
         ArrayList<String[]> stringArrayList = (ArrayList<String[]>) arrayList.stream()
                 .map((s) -> s.split(" ")).collect(toList());
         products = stringArrayList.get(0).clone();
-        for (int i = 0; i < products.length ; i++) {
+        for (int i = 0; i < products.length; i++) {
             prices[i] = Integer.parseInt(stringArrayList.get(1)[i]);
             productCounts[i] = Integer.parseInt(stringArrayList.get(2)[i]);
         }
